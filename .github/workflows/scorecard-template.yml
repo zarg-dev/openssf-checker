@@ -10,27 +10,38 @@ on:
       SCORECARD_GITHUB_TOKEN:
         required: true
 
+permissions:
+  contents: write  # This enables git push using GITHUB_TOKEN
+
 jobs:
   run-scorecard:
     runs-on: ubuntu-latest
     steps:
-      - name: Sanitize Repo Name
+      - name: Checkout the repository
+        uses: actions/checkout@v4
+        with:
+          token: ${{ secrets.GITHUB_TOKEN  }}
+
+      - name: Set up repo folder name
         id: sanitize
         run: |
-          # Replace slash with underscore for folder names
-          echo "repo_path=$(echo '${{ inputs.repo }}' | sed 's|/|_|g')" >> $GITHUB_OUTPUT
+          REPO_PATH=$(echo "${{ inputs.repo }}" | sed 's|/|_|g')
+          echo "repo_path=$REPO_PATH" >> $GITHUB_OUTPUT
+          echo "timestamp=$(date +'%Y-%m-%d')" >> $GITHUB_OUTPUT
 
       - name: Run Scorecard and Save Report
         run: |
-          mkdir -p scorecard-results/${{ steps.sanitize.outputs.repo_path }}
+          mkdir -p scorecard-reports/${{ steps.sanitize.outputs.repo_path }}
           docker run --rm \
-            -e GITHUB_AUTH_TOKEN=${{ secrets.SCORECARD_GITHUB_TOKEN }} \
+            -e GITHUB_AUTH_TOKEN=${{ secrets.GITHUB_TOKEN }} \
             gcr.io/openssf/scorecard:stable \
             --repo=github.com/${{ inputs.repo }} \
-            --format=json > scorecard-results/${{ steps.sanitize.outputs.repo_path }}/report.json || true
+            --format=json > scorecard-reports/${{ steps.sanitize.outputs.repo_path }}/${{ steps.sanitize.outputs.timestamp }}-report.json || true
 
-      - name: Upload Scorecard Report
-        uses: actions/upload-artifact@v4
-        with:
-          name: scorecard-${{ steps.sanitize.outputs.repo_path }}
-          path: scorecard-results/${{ steps.sanitize.outputs.repo_path }}/report.json
+      - name: Commit and Push Report
+        run: |
+          git config user.name "scorecard-bot"
+          git config user.email "scorecard-bot@users.noreply.github.com"
+          git add scorecard-reports/
+          git commit -m "chore(scorecard): update report for ${{ inputs.repo }} on ${{ steps.sanitize.outputs.timestamp }}" || echo "No changes to commit"
+          git push
