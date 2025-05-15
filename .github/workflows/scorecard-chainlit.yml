@@ -2,7 +2,7 @@ name: Scorecard - Chainlit
 
 on:
   schedule:
-    - cron: '0 3 * * 1' # Weekly on Monday
+    - cron: '0 3 * * 1'
   workflow_dispatch:
 
 jobs:
@@ -10,3 +10,5 @@ jobs:
     uses: ./.github/workflows/scorecard-template.yml
     with:
       repo: 'Chainlit/chainlit'
+    secrets:
+      SCORECARD_GITHUB_TOKEN: ${{ secrets.SCORECARD_GITHUB_TOKEN }}
