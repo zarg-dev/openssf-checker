@@ -1,17 +1,33 @@
-name: Scorecard Analysis - Chainlit
+name: Scorecard Analysis Template
 
 on:
-  schedule:
-    - cron: '0 3 * * 1' # Runs every Monday at 3:00 AM UTC
-  workflow_dispatch:     # Allows manual triggering
+  workflow_call:
+    inputs:
+      repo:
+        required: true
+        type: string
 
 jobs:
   run-scorecard:
     runs-on: ubuntu-latest
     steps:
-      - name: Run OpenSSF Scorecard on Chainlit
+      - name: Sanitize Repo Name
+        id: sanitize
         run: |
+          # Replace slash with underscore for folder names
+          echo "repo_path=$(echo '${{ inputs.repo }}' | sed 's|/|_|g')" >> $GITHUB_OUTPUT
+
+      - name: Run Scorecard and Save Report
+        run: |
+          mkdir -p scorecard-results/${{ steps.sanitize.outputs.repo_path }}
           docker run --rm \
             -e GITHUB_AUTH_TOKEN=${{ secrets.SCORECARD_GITHUB_TOKEN }} \
             gcr.io/openssf/scorecard:stable \
-            --repo=github.com/Chainlit/chainlit
+            --repo=github.com/${{ inputs.repo }} \
+            --format=json > scorecard-results/${{ steps.sanitize.outputs.repo_path }}/report.json || true
+
+      - name: Upload Scorecard Report
+        uses: actions/upload-artifact@v4
+        with:
+          name: scorecard-${{ steps.sanitize.outputs.repo_path }}
+          path: scorecard-results/${{ steps.sanitize.outputs.repo_path }}/report.json
