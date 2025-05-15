@@ -1,0 +1,12 @@
+name: Scorecard - Chainlit
+
+on:
+  schedule:
+    - cron: '0 3 * * 1' # Weekly on Monday
+  workflow_dispatch:
+
+jobs:
+  scorecard:
+    uses: ./.github/workflows/scorecard-template.yml
+    with:
+      repo: 'Chainlit/chainlit'
