@@ -6,6 +6,9 @@ on:
       repo:
         required: true
         type: string
+  secrets:
+      SCORECARD_GITHUB_TOKEN:
+        required: true
 
 jobs:
   run-scorecard:
