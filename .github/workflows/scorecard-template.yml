@@ -6,7 +6,7 @@ on:
       repo:
         required: true
         type: string
-  secrets:
+    secrets:
       SCORECARD_GITHUB_TOKEN:
         required: true
 
