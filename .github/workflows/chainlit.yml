@@ -1,0 +1,17 @@
+name: Scorecard Analysis - Chainlit
+
+on:
+  schedule:
+    - cron: '0 3 * * 1' # Runs every Monday at 3:00 AM UTC
+  workflow_dispatch:     # Allows manual triggering
+
+jobs:
+  run-scorecard:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Run OpenSSF Scorecard on Chainlit
+        run: |
+          docker run --rm \
+            -e GITHUB_AUTH_TOKEN=${{ secrets.SCORECARD_GITHUB_TOKEN }} \
+            gcr.io/openssf/scorecard:stable \
+            --repo=github.com/Chainlit/chainlit
