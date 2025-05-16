@@ -15,13 +15,14 @@ def parse_scorecard(file_path):
         data = json.load(f)
     score = data.get("score", "N/A")
     checks = data.get("checks", [])
+    important_check_names = [
+        "Branch-Protection", "Token-Permissions", "Signed-Releases"
+    ]
     important_checks = [
-        c for c in checks if c["name"] in [
-            "Branch-Protection", "Token-Permissions", "Signed-Releases"
-        ]
+        c for c in checks if c["name"] in important_check_names
     ]
     checks_summary = ", ".join(
-        f'{c["name"]} {"✅" if c["pass"] else "❌"}' for c in important_checks
+        f'{c["name"]} {"✅" if c["score"] > 5 else "❌"}' for c in important_checks
     )
     return score, checks_summary
 
