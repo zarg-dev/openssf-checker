@@ -45,3 +45,28 @@ jobs:
           git add scorecard-reports/
           git commit -m "chore(scorecard): update report for ${{ inputs.repo }} on ${{ steps.sanitize.outputs.timestamp }}" || echo "No changes to commit"
           git push
+  update-dashboard:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.x'
+
+      - name: Run Dashboard Generator
+        run: |
+          pip install --quiet --upgrade pip
+          python scripts/generate_scorecard_dashboard.py
+
+      - name: Commit and Push README update
+        run: |
+          git config user.name "scorecard-bot"
+          git config user.email "scorecard-bot@users.noreply.github.com"
+          git add README.md
+          git commit -m "chore(dashboard): update README with latest scorecard summary" || echo "No changes"
+          git push
+
