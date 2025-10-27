@@ -6,8 +6,8 @@ This dashboard is auto-generated based on the latest reports.
 
 | Repo | Date | Score | Critical Checks |
 |------|------|-------|-----------------|
-| [Chainlit/chainlit](https://github.com/Chainlit/chainlit) | 2025-10-06 | 6.5 | Branch-Protection ❌, Signed-Releases ❌, Token-Permissions ✅ |
+| [Chainlit/chainlit](https://github.com/Chainlit/chainlit) | 2025-10-20 | 6.5 | Branch-Protection ❌, Signed-Releases ❌, Token-Permissions ✅ |
 
 ## Index
 
-- [Chainlit/chainlit latest report](./scorecard-reports/Chainlit_chainlit/2025-10-06-report.json)
+- [Chainlit/chainlit latest report](./scorecard-reports/Chainlit_chainlit/2025-10-20-report.json)
